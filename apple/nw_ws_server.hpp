@@ -48,14 +48,6 @@ public:
         m_completion.wait_for_closed();
     }
     
-    // Cast server object
-    
-    template <class T>
-    static T *cast_server_object(ws_connection_id id, void *untyped_server)
-    {
-        return reinterpret_cast<T *>(untyped_server);
-    }
-    
 private:
     
     // Constructor

@@ -40,24 +40,6 @@ public:
             mg_websocket_write(it->second, MG_WEBSOCKET_OPCODE_BINARY, const_char_data, size);
     }
     
-    // Cast server object
-    
-    template <class T>
-    static T *cast_server_object(ws_connection_id id, void *untyped_server)
-    {
-        auto connection = as_server(untyped_server)->find(id);
-        const struct mg_request_info *request_info = mg_get_request_info(connection);
-        
-        assert(request_info != nullptr);
-        
-        T *server = reinterpret_cast<T *>(request_info->user_data);
-        
-        assert(server != nullptr);
-        assert(server == reinterpret_cast<T *>(untyped_server));
-        
-        return server;
-    }
-    
 private:
     
     // Conversion to Server Object
@@ -75,32 +57,43 @@ private:
         static int connect(const struct mg_connection *connection, void *x)
         {
             auto id = as_server(x)->add_connection(const_cast<struct mg_connection *>(connection));
-            handlers.m_connect(id, get_owner(x));
+            handlers.m_connect(id, get_owner(connection, x));
             return 0;
         }
         
         static void ready(struct mg_connection *connection, void *x)
         {
             auto id = as_server(x)->find(connection);
-            handlers.m_ready(id, get_owner(x));
+            handlers.m_ready(id, get_owner(connection, x));
         }
         
         static int receive(struct mg_connection *connection, int, char *buffer, size_t size, void *x)
         {
             auto id = as_server(x)->find(connection);
-            handlers.m_receive(id, buffer, size, get_owner(x));
+            handlers.m_receive(id, buffer, size, get_owner(connection, x));
             return 1;
         }
         
         static void close(const struct mg_connection *connection, void *x)
         {
             auto id = as_server(x)->remove_connection(connection);
-            handlers.m_close(id, get_owner(x));
+            handlers.m_close(id, get_owner(connection, x));
         }
         
-        static void *get_owner(void *x)
+        // Cast server object
+        
+        static void *get_owner(const struct mg_connection *connection, void *untyped_server)
         {
-            return as_server(x)->m_owner;
+            const struct mg_request_info *request_info = mg_get_request_info(connection);
+            
+            assert(request_info != nullptr);
+            
+            void *server = request_info->user_data;
+            
+            assert(server != nullptr);
+            assert(server == untyped_server);
+                        
+            return as_server(server)->m_owner;
         }
     };
     
