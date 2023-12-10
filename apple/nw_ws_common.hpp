@@ -71,7 +71,11 @@ protected:
     {
         auto set_options = ^(nw_protocol_options_t options)
         {
+            nw_tcp_options_set_no_delay(options, true);
             nw_tcp_options_set_enable_keepalive(options, true);
+            nw_tcp_options_set_keepalive_idle_time(options, 1);
+            nw_tcp_options_set_keepalive_count(options, 1);
+            nw_tcp_options_set_keepalive_interval(options, 2);
             nw_tcp_options_set_connection_timeout(options, 2);
             nw_tcp_options_set_persist_timeout(options, 2);
             nw_tcp_options_set_retransmit_connection_drop_time(options, 2);
