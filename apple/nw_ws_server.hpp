@@ -9,7 +9,7 @@
 
 #include <string>
 
-// Apple Network Framework-based Websocket Server
+// Apple Network framework-based websocket server
 
 class nw_ws_server
 : public nw_ws_common, public ws_server_base<nw_ws_server, nw_listener_t, nw_connection_t>
@@ -83,6 +83,8 @@ private:
         
         // Handlers for connection and state updates
         
+        // Listener state block
+        
         auto listener_state_block = ^(nw_listener_state_t state, nw_error_t _Nullable error)
         {
             errno = error ? nw_error_get_error_code(error) : 0;
@@ -100,7 +102,9 @@ private:
                 nw_release(listener);
             }
         };
-                
+            
+        // Connection block (for client connections)
+        
         auto connection_block = ^(nw_connection_t _Nonnull connection)
         {
             auto id = add_connection(connection);
@@ -110,6 +114,8 @@ private:
             
             nw_retain(connection);
             
+            // State block (for client connections)
+
             auto client_state_block = ^(nw_connection_state_t state, nw_error_t error)
             {
                 nw_endpoint_t remote = nw_connection_copy_endpoint(connection);

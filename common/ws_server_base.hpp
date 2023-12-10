@@ -8,10 +8,12 @@
 #include <map>
 #include <type_traits>
 
-template <class T, class U, class V>
-class ws_server_base : public ws_base<T, U>
+// A base class for all websocket servers
+
+template <class T, class server_type, class connection_type>
+class ws_server_base : public ws_base<T, server_type>
 {
-    using const_connection_type = const typename std::remove_pointer<V>::type *const;
+    using const_connection_type = const typename std::remove_pointer<connection_type>::type *const;
     
 public:
     
@@ -20,7 +22,7 @@ public:
     template <const ws_server_handlers& handlers>
     static T *create(const char *port, const char *path, ws_server_owner<handlers> owner)
     {
-        return ws_base<T, U>::create(port, path, owner);
+        return ws_base<T, server_type>::create(port, path, owner);
     }
     
     // The number of connected clients
@@ -34,7 +36,7 @@ protected:
     
     // Find connection pointers from ids
     
-    V find(ws_connection_id id)
+    connection_type find(ws_connection_id id)
     {
         auto it = m_map_from_id.find(id);
         return (it == m_map_from_id.end()) ? nullptr : it->second;
@@ -48,7 +50,9 @@ protected:
         return (it == m_map_from_connection.end()) ? -1 : it->second;
     }
     
-    ws_connection_id add_connection(V connection)
+    // Add a new connection to the maps
+    
+    ws_connection_id add_connection(connection_type connection)
     {
         ws_connection_id id = new_id();
         
@@ -60,7 +64,9 @@ protected:
         return id;
     }
     
-    ws_connection_id remove_connection(V connection)
+    // Remove an expired connection from the maps
+    
+    ws_connection_id remove_connection(const_connection_type connection)
     {
         ws_connection_id id = m_map_from_connection[connection];
         
@@ -72,12 +78,16 @@ protected:
         return id;
     }
     
+    // Call a function on each connection
+    
     template <typename F>
     void for_each_connection(F func)
     {
         for (auto it = m_map_from_id.begin(); it != m_map_from_id.end(); it++)
             func(it->second);
     }
+    
+    // Generate a new ID
     
     ws_connection_id new_id()
     {
@@ -89,7 +99,7 @@ protected:
     }
     
     std::map<const_connection_type, ws_connection_id> m_map_from_connection;
-    std::map<ws_connection_id, V> m_map_from_id;
+    std::map<ws_connection_id, connection_type> m_map_from_id;
 };
 
 #endif /* WS_SERVER_BASE_HPP */

@@ -7,7 +7,7 @@
 
 #include "../../dependencies/civetweb/include/civetweb.h"
 
-// CivetWeb-based Websocket Client
+// CivetWeb-based websocket client
 
 class cw_ws_client : public ws_client_base<cw_ws_client, struct mg_connection *>
 {
@@ -55,6 +55,8 @@ private:
             handlers.m_close(id, x);
         }
     };
+    
+    // Constructor
     
     template <const ws_client_handlers& handlers>
     cw_ws_client(const char *host, int port, const char *path, ws_client_owner<handlers> owner)

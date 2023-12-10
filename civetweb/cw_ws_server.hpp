@@ -7,7 +7,7 @@
 
 #include "../../dependencies/civetweb/include/civetweb.h"
 
-// CivetWeb-based Websocket Server
+// CivetWeb-based websocket server
 
 class cw_ws_server : public ws_server_base<cw_ws_server, mg_context *, struct mg_connection *>
 {

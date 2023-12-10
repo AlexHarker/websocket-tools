@@ -4,6 +4,7 @@
 
 #include "ws_base.hpp"
 
+// A base class for websocket clients
 
 template <class T, class U>
 class ws_client_base : public ws_base<T, U>

@@ -9,7 +9,7 @@
 
 #include <string>
 
-// Apple Network Framework-based Websocket Client
+// Apple Network framework-based websocket client
 
 class nw_ws_client : public nw_ws_common, public ws_client_base<nw_ws_client, nw_connection_t>
 {
@@ -36,6 +36,8 @@ public:
     }
     
 private:
+    
+    // Constructor
     
     template <const ws_client_handlers& handlers>
     nw_ws_client(const char *host, int port, const char *path, ws_client_owner<handlers> owner)

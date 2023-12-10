@@ -13,7 +13,7 @@ struct ws_handler_funcs
     using receive_handler = void(*)(ws_connection_id, const void *, size_t, void *);
 };
 
-// Client handlers
+// Client handlers (and owner type which includes the handlers)
 
 struct ws_client_handlers
 {
@@ -27,7 +27,7 @@ struct ws_client_owner
     void *m_owner;
 };
 
-// Server handlers
+// Server handlers (and owner type which includes the handlers)
 
 struct ws_server_handlers
 {
