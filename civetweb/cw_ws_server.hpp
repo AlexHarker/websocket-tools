@@ -82,18 +82,17 @@ private:
         
         // Cast server object
         
-        static void *get_owner(const struct mg_connection *connection, void *untyped_server)
+        static void *get_owner(const struct mg_connection *connection, void *untyped_local_server)
         {
             const struct mg_request_info *request_info = mg_get_request_info(connection);
             
             assert(request_info != nullptr);
             
-            void *server = request_info->user_data;
+            void *owner = request_info->user_data;
             
-            assert(server != nullptr);
-            assert(as_server(server)->m_owner == untyped_server);
+            assert(as_server(untyped_local_server)->m_owner == owner);
                         
-            return as_server(server)->m_owner;
+            return owner;
         }
     };
     
