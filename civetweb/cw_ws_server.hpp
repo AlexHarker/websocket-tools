@@ -1,0 +1,155 @@
+
+#ifndef CW_WS_SERVER_HPP
+#define CW_WS_SERVER_HPP
+
+#include "../common/ws_handlers.hpp"
+#include "../common/ws_server_base.hpp"
+
+#include "../../dependencies/civetweb/include/civetweb.h"
+
+// CivetWeb-based Websocket Server
+
+class cw_ws_server : public ws_server_base<cw_ws_server, mg_context *, struct mg_connection *>
+{
+    friend ws_base<cw_ws_server, mg_context *>;
+
+public:
+    
+    // Types
+    
+    using connection_type = struct mg_connection *;
+    using server_type = mg_context *;
+    
+    // Destructor
+    
+    ~cw_ws_server()
+    {
+        mg_stop(m_handle);
+    }
+
+    // Send
+    
+    void send(ws_connection_id id, const void *data, size_t size)
+    {
+        auto const_char_data = reinterpret_cast<const char *>(data);
+        mg_websocket_write(find(id), MG_WEBSOCKET_OPCODE_BINARY, const_char_data, size);
+    }
+    
+    // Send (to all)
+    
+    void send(const void *data, size_t size)
+    {
+        auto const_char_data = reinterpret_cast<const char *>(data);
+
+        for (auto it = m_map_from_id.begin(); it != m_map_from_id.end(); it++)
+            mg_websocket_write(it->second, MG_WEBSOCKET_OPCODE_BINARY, const_char_data, size);
+    }
+    
+    // Cast server object
+    
+    template <class T>
+    static T *cast_server_object(ws_connection_id id, void *untyped_server)
+    {
+        auto connection = as_server(untyped_server)->find(id);
+        const struct mg_request_info *request_info = mg_get_request_info(connection);
+        
+        assert(request_info != nullptr);
+        
+        T *server = reinterpret_cast<T *>(request_info->user_data);
+        
+        assert(server != nullptr);
+        assert(server == reinterpret_cast<T *>(untyped_server));
+        
+        return server;
+    }
+    
+private:
+    
+    // Conversion to Server Object
+    
+    static cw_ws_server *as_server(void *x)
+    {
+        return reinterpret_cast<cw_ws_server *>(x);
+    }
+    
+    // CivetWeb handler wrapper
+    
+    template <const ws_server_handlers& handlers>
+    struct cw_handlers
+    {
+        static int connect(const struct mg_connection *connection, void *x)
+        {
+            handlers.m_connect(get_id(connection, x), get_owner(x));
+            return 0;
+        }
+        
+        static void ready(struct mg_connection *connection, void *x)
+        {
+            handlers.m_ready(get_id(connection, x), get_owner(x));
+        }
+        
+        static int receive(struct mg_connection *connection, int, char *buffer, size_t size, void *x)
+        {
+            handlers.m_receive(get_id(connection, x), buffer, size, get_owner(x));
+            return 1;
+        }
+        
+        static void close(const struct mg_connection *connection, void *x)
+        {
+            handlers.m_close(get_id(connection, x), get_owner(x));
+        }
+        
+        static ws_connection_id get_id(const struct mg_connection *connection, void *x)
+        {
+            return as_server(x)->find(connection);
+        }
+        
+        static void *get_owner(void *x)
+        {
+            return as_server(x)->m_owner;
+        }
+    };
+    
+    // Constructor
+
+    template <const ws_server_handlers& handlers>
+    cw_ws_server(const char *port, const char *path, ws_server_owner<handlers> owner)
+    : m_owner(owner.m_owner)
+    {
+        const char* options[] =
+        {
+            "listening_ports", port,
+            "tcp_nodelay", "1",
+            "enable_keep_alive", "yes",
+            "keep_alive_timeout_ms", "500",
+            NULL
+        };
+        
+        struct mg_init_data mg_start_init_data = {};
+        mg_start_init_data.callbacks = nullptr;
+        mg_start_init_data.user_data = owner.m_owner;
+        mg_start_init_data.configuration_options = options;
+        
+        struct mg_error_data mg_start_error_data = {};
+        char errtxtbuf[256] = {0};
+        mg_start_error_data.text = errtxtbuf;
+        mg_start_error_data.text_buffer_size = sizeof(errtxtbuf);
+        
+        m_handle = mg_start2(&mg_start_init_data, &mg_start_error_data);
+        
+        if (m_handle)
+        {
+            mg_set_websocket_handler(m_handle,
+                                     path,
+                                     cw_handlers<handlers>::connect,
+                                     cw_handlers<handlers>::ready,
+                                     cw_handlers<handlers>::receive,
+                                     cw_handlers<handlers>::close,
+                                     this);
+        }
+    }
+    
+    void *m_owner;
+};
+
+#endif /* CW_WS_SERVER_HPP */
