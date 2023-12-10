@@ -106,11 +106,6 @@ protected:
         
         auto send_complete_block = ^(nw_error_t _Nullable error)
         {
-            // Cancel the connection if there is an error
-            
-            //if (error)
-            //    nw_connection_cancel(connection);
-            
             // Release the context on completion
             
             nw_release(context);
