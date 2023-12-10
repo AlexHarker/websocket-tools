@@ -15,10 +15,6 @@ class cw_ws_client : public ws_client_base<cw_ws_client, struct mg_connection *>
 
 public:
     
-    // Types
-    
-    using connection_type = struct mg_connection *;
-    
     // Destructor
     
     ~cw_ws_client()

@@ -15,11 +15,6 @@ class cw_ws_server : public ws_server_base<cw_ws_server, mg_context *, struct mg
 
 public:
     
-    // Types
-    
-    using connection_type = struct mg_connection *;
-    using server_type = mg_context *;
-    
     // Destructor
     
     ~cw_ws_server()

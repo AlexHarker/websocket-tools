@@ -13,33 +13,18 @@ class nw_ws_common
 {
 protected:
     
-    static constexpr int nw_ws_connection_timeout = 400;
-    
-    // Constructor and Destructor
-    
-    nw_ws_common() : m_queue(nullptr)
-    {
-        auto attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -4);
-        m_queue = dispatch_queue_create("websocket_queue", attr);
-    }
-    
-    ~nw_ws_common()
-    {
-        // FIX - do we need to make sure the queue is empty?
-        
-        dispatch_release(m_queue);
-    }
+    static constexpr int nw_ws_connection_timeout_ms = 400;
     
     // Connection Helper
     
     struct connection_completion
     {
         using clock = std::chrono::steady_clock;
-
+        
         enum class modes { connecting, ready, closed };
         
         // FIX - sleep/yield threads?
-
+        
         void wait_for_completion(int time_out = 0)
         {
             auto exit_time = clock::now() + std::chrono::milliseconds(time_out);
@@ -61,10 +46,25 @@ protected:
         bool completed() { return m_mode != modes::connecting; }
         bool closed() { return m_mode == modes::closed; }
         bool ready() { return m_mode == modes::ready; }
-            
+        
         modes m_mode = modes::connecting;
     };
     
+    // Constructor and Destructor
+    
+    nw_ws_common() : m_queue(nullptr)
+    {
+        auto attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, -4);
+        m_queue = dispatch_queue_create("websocket_queue", attr);
+    }
+    
+    ~nw_ws_common()
+    {
+        // FIX - do we need to make sure the queue is empty?
+        
+        dispatch_release(m_queue);
+    }
+
     // Parameters
     
     static nw_parameters_t create_websocket_parameters()

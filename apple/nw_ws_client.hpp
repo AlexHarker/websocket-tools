@@ -16,11 +16,7 @@ class nw_ws_client : public nw_ws_common, public ws_client_base<nw_ws_client, nw
     friend ws_base<nw_ws_client, nw_connection_t>;
 
 public:
-    
-    // Types
-    
-    using connection_type = nw_connection_t;
-        
+
     // Destructor
     
     ~nw_ws_client()
@@ -98,7 +94,7 @@ private:
         // Start connection
         
         nw_connection_start(connection);
-        completion.wait_for_completion(nw_ws_connection_timeout);
+        completion.wait_for_completion(nw_ws_connection_timeout_ms);
         
         // Cancel if timed out
         

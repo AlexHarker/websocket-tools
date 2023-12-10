@@ -17,12 +17,7 @@ class nw_ws_server
     friend ws_base<nw_ws_server, nw_listener_t>;
     
 public:
-    
-    // Types
-    
-    using connection_type = nw_connection_t;
-    using server_type = nw_listener_t;
-    
+ 
     // Send
     
     void send(ws_connection_id id, const void *data, size_t size)
@@ -163,7 +158,7 @@ private:
         // Start server
         
         nw_listener_start(listener);
-        completion.wait_for_completion(nw_ws_connection_timeout);
+        completion.wait_for_completion(nw_ws_connection_timeout_ms);
         
         // Cancel if timed out
         
