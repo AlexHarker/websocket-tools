@@ -64,12 +64,16 @@ private:
         m_handle = mg_connect_websocket_client(host,
                                                port,
                                                0,                           // ssl off
-                                               nullptr, 0,                  // errors buffer / size
-                                               path, "null",                // origin (use "null")
+                                               errors,                      // errors buffer
+                                               256,                         // errors buffer size
+                                               path,
+                                               "null",                      // origin (use "null")
                                                cw_handlers<handlers>::data,
                                                cw_handlers<handlers>::close,
                                                owner.m_owner);
     }
+    
+    char errors[256];
 };
 
 #endif /* CW_WS_CLIENT_HPP */
