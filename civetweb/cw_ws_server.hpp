@@ -91,7 +91,7 @@ private:
             void *server = request_info->user_data;
             
             assert(server != nullptr);
-            assert(server == untyped_server);
+            assert(as_server(server)->m_owner == untyped_server);
                         
             return as_server(server)->m_owner;
         }
