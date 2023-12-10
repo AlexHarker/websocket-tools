@@ -74,29 +74,28 @@ private:
     {
         static int connect(const struct mg_connection *connection, void *x)
         {
-            handlers.m_connect(get_id(connection, x), get_owner(x));
+            auto id = as_server(x)->add_connection(const_cast<struct mg_connection *>(connection));
+            handlers.m_connect(id, get_owner(x));
             return 0;
         }
         
         static void ready(struct mg_connection *connection, void *x)
         {
-            handlers.m_ready(get_id(connection, x), get_owner(x));
+            auto id = as_server(x)->find(connection);
+            handlers.m_ready(id, get_owner(x));
         }
         
         static int receive(struct mg_connection *connection, int, char *buffer, size_t size, void *x)
         {
-            handlers.m_receive(get_id(connection, x), buffer, size, get_owner(x));
+            auto id = as_server(x)->find(connection);
+            handlers.m_receive(id, buffer, size, get_owner(x));
             return 1;
         }
         
         static void close(const struct mg_connection *connection, void *x)
         {
-            handlers.m_close(get_id(connection, x), get_owner(x));
-        }
-        
-        static ws_connection_id get_id(const struct mg_connection *connection, void *x)
-        {
-            return as_server(x)->find(connection);
+            auto id = as_server(x)->remove_connection(connection);
+            handlers.m_close(id, get_owner(x));
         }
         
         static void *get_owner(void *x)
