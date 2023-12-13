@@ -7,6 +7,7 @@
 #include "../common/ws_handlers.hpp"
 #include "../common/ws_base.hpp"
 
+#include <atomic>
 #include <chrono>
 
 class nw_ws_common
@@ -14,15 +15,15 @@ class nw_ws_common
 protected:
     
     static constexpr int nw_ws_connection_timeout_ms = 400;
-    
+    enum class completion_modes { connecting, ready, closed };
+
     // Connection Helper
     
-    struct connection_completion
+    class connection_completion
     {
         using clock = std::chrono::steady_clock;
         
-        enum class modes { connecting, ready, closed };
-        
+    public:
         // FIX - sleep/yield threads?
         
         void wait_for_completion(int time_out = 0)
@@ -41,13 +42,17 @@ protected:
             }
         }
         
+        void set(completion_modes mode) { m_mode.store(mode); }
+        
         void wait_for_closed() { while (!closed()){}; }
         
-        bool completed() { return m_mode != modes::connecting; }
-        bool closed() { return m_mode == modes::closed; }
-        bool ready() { return m_mode == modes::ready; }
+        bool completed() { return m_mode.load() != completion_modes::connecting; }
+        bool closed() { return m_mode.load() == completion_modes::closed; }
+        bool ready() { return m_mode.load() == completion_modes::ready; }
         
-        modes m_mode = modes::connecting;
+    private:
+        
+        std::atomic<completion_modes> m_mode = completion_modes::connecting;
     };
     
     // Constructor and Destructor

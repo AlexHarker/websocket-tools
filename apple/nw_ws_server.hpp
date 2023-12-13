@@ -83,11 +83,11 @@ private:
             
             if (state == nw_listener_state_ready)
             {
-                completion.m_mode = connection_completion::modes::ready;
+                completion.set(completion_modes::ready);
             }
             else if (state == nw_listener_state_cancelled || state == nw_listener_state_failed)
             {
-                completion.m_mode = connection_completion::modes::closed;
+                completion.set(completion_modes::closed);
                 
                 // Release the primary reference on the connection that was taken at creation time
                 

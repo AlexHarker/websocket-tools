@@ -70,7 +70,7 @@ private:
             {
                 // Start the receive process
                 
-                completion.m_mode = connection_completion::modes::ready;
+                completion.set(completion_modes::ready);
                 receive(connection, id, handlers, owner.m_owner);
             }
             else if (state == nw_connection_state_waiting)
@@ -79,7 +79,7 @@ private:
             }
             else if (state == nw_connection_state_cancelled || state == nw_connection_state_failed)
             {
-                completion.m_mode = connection_completion::modes::closed;
+                completion.set(completion_modes::closed);
                 handlers.m_close(id, owner.m_owner);
                 
                 // Release the primary reference on the connection that was taken at creation time
