@@ -93,6 +93,7 @@ protected:
         auto websocket_options = nw_ws_create_options(nw_ws_version_13);
         
         nw_protocol_stack_prepend_application_protocol(protocol_stack, websocket_options);
+        nw_parameters_set_include_peer_to_peer(parameters, true);
         nw_parameters_set_service_class(parameters, nw_service_class_signaling);
         
         // Release temporaries
