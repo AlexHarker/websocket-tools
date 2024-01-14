@@ -5,7 +5,7 @@
 #include "../common/ws_handlers.hpp"
 #include "../common/ws_server_base.hpp"
 
-#include "../../dependencies/civetweb/include/civetweb.h"
+#include "../dependencies/civetweb/include/civetweb.h"
 
 // CivetWeb-based websocket server
 
