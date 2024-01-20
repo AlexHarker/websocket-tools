@@ -15,7 +15,7 @@ public:
     
     template <const ws_client_handlers& handlers>
     static T *create(const char *host,
-                     int port,
+                     uint16_t port,
                      const char *path,
                      ws_client_owner<handlers> owner)
 

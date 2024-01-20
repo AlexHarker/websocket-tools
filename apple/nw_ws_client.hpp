@@ -40,7 +40,7 @@ private:
     // Constructor
     
     template <const ws_client_handlers& handlers>
-    nw_ws_client(const char *host, int port, const char *path, ws_client_owner<handlers> owner)
+    nw_ws_client(const char *host, uint16_t port, const char *path, ws_client_owner<handlers> owner)
     {
         __block connection_completion& completion = m_completion;
         

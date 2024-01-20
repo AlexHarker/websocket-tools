@@ -59,7 +59,7 @@ private:
     // Constructor
     
     template <const ws_client_handlers& handlers>
-    cw_ws_client(const char *host, int port, const char *path, ws_client_owner<handlers> owner)
+    cw_ws_client(const char *host, uint16_t port, const char *path, ws_client_owner<handlers> owner)
     {
         m_handle = mg_connect_websocket_client(host,
                                                port,
