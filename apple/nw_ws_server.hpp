@@ -10,7 +10,13 @@
 #include <string>
 
 // Apple Network framework-based websocket server
-
+/**
+ * @class nw_ws_server
+ * @brief A WebSocket server implementation using Apple's Network framework.
+ *
+ * This class provides WebSocket server functionalities, allowing connections,
+ * data transmission, and resource cleanup using the Network framework.
+ */
 class nw_ws_server
 : public nw_ws_common, public ws_server_base<nw_ws_server, nw_listener_t, nw_connection_t>
 {
@@ -18,23 +24,40 @@ class nw_ws_server
     
 public:
  
-    // Send
-    
+    /**
+    * @brief Sends data to a specific WebSocket connection.
+    *
+    * @param id The connection identifier.
+    * @param data Pointer to the data to be sent.
+    * @param size Size of the data in bytes.
+    *
+    * This method sends data to a WebSocket connection identified by `id`.
+    */
     void send(ws_connection_id id, const void *data, size_t size)
     {
         nw_ws_common::send(find(id), data, size);
     }
     
-    // Send (to all)
-    
+    /**
+    * @brief Sends data to all connected WebSocket clients.
+    *
+    * @param data Pointer to the data to be sent.
+    * @param size Size of the data in bytes.
+    *
+    * This method broadcasts the data to all connected WebSocket clients.
+    */
     void send(const void *data, size_t size)
     {
         for (auto it = m_map_from_id.begin(); it != m_map_from_id.end(); it++)
             nw_ws_common::send(it->second, data, size);
     }
     
-    // Destructor
-    
+    /**
+    * @brief Destructor for the WebSocket server.
+    *
+    * Cleans up all active connections and releases resources associated
+    * with the WebSocket server.
+    */
     ~nw_ws_server()
     {
         // Release all connections
@@ -50,8 +73,15 @@ public:
     
 private:
     
-    // Constructor
-    
+    /**
+    * @brief Constructor for the WebSocket server.
+    *
+    * @param port The port on which the server will listen.
+    * @param path The WebSocket endpoint path.
+    * @param owner The owner managing server handlers.
+    *
+    * Initializes the WebSocket server, sets up connection handlers, and starts the listener.
+    */
     template <const ws_server_handlers& handlers>
     nw_ws_server(const char *port, const char *path, ws_server_owner<handlers> owner)
     {
