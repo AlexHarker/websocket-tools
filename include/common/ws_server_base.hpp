@@ -63,8 +63,13 @@ public:
         return m_map_from_connection.size();
     }
     
-    // The current port
-    
+    /**
+     * @brief Retrieves the current port of the WebSocket server.
+     *
+     * This method returns the port on which the WebSocket server is listening for incoming connections.
+     *
+     * @return uint16_t The current port of the WebSocket server.
+     */    
     uint16_t port() const
     {
         return m_port;
