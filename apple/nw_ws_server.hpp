@@ -172,7 +172,10 @@ private:
         nw_release(endpoint);
         
         if (completion.ready())
+        {
             m_handle = listener;
+            m_port = nw_listener_get_port(listener);
+        }
         else
             nw_release(listener);
     }

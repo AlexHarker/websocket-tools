@@ -132,6 +132,12 @@ private:
                                      cw_handlers<handlers>::receive,
                                      cw_handlers<handlers>::close,
                                      this);
+            
+            mg_server_port ports[1];
+            
+            if (mg_get_server_ports(m_handle, 1, ports))
+                m_port = static_cast<uint16_t>(ports[0].port);
+            
         }
     }
     

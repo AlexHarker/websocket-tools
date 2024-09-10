@@ -32,6 +32,13 @@ public:
         return m_map_from_connection.size();
     }
     
+    // The current port
+    
+    uint16_t port() const
+    {
+        return m_port;
+    }
+    
 protected:
     
     // Find connection pointers from ids
@@ -100,6 +107,7 @@ protected:
     
     std::map<const_connection_type, ws_connection_id> m_map_from_connection;
     std::map<ws_connection_id, connection_type> m_map_from_id;
+    uint16_t m_port = 0;
 };
 
 #endif /* WS_SERVER_BASE_HPP */
